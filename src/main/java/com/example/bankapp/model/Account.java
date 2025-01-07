@@ -2,10 +2,12 @@ package com.example.bankapp.model;
 
 import jakarta.persistence.*;
 import org.springframework.security.core.GrantedAuthority;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 
 import java.math.BigDecimal;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.List;
 
 @Entity
@@ -16,35 +18,31 @@ public class Account implements UserDetails {
     private Long id;
     private String username;
     private String password;
+    private String email;
+    
+    @Column(precision = 10, scale = 2)
     private BigDecimal balance;
 
     @OneToMany(mappedBy = "account")
     private List<Transaction> transactions;
 
-    @Transient
-    private Collection<? extends GrantedAuthority> authorities;
-
     public Account() {
-
+        this.balance = BigDecimal.ZERO;
     }
 
-    public Account(String username, String password, BigDecimal balance, List<Transaction> transactions, Collection<? extends GrantedAuthority> authorities) {
+    public Account(String username, String password, BigDecimal balance, List<Transaction> transactions) {
         this.username = username;
         this.password = password;
         this.balance = balance;
         this.transactions = transactions;
-        this.authorities = authorities;
     }
 
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
-        return authorities;
+        return Collections.singletonList(new SimpleGrantedAuthority("ROLE_USER"));
     }
 
-    public void setAuthorities(Collection<? extends GrantedAuthority> authorities) {
-        this.authorities = authorities;
-    }
-
+    // Standard getters and setters
     public Long getId() {
         return id;
     }
@@ -53,6 +51,7 @@ public class Account implements UserDetails {
         this.id = id;
     }
 
+    @Override
     public String getUsername() {
         return username;
     }
@@ -61,6 +60,7 @@ public class Account implements UserDetails {
         this.username = username;
     }
 
+    @Override
     public String getPassword() {
         return password;
     }
@@ -77,11 +77,39 @@ public class Account implements UserDetails {
         this.balance = balance;
     }
 
+    public String getEmail() {
+        return email;
+    }
+
+    public void setEmail(String email) {
+        this.email = email;
+    }
+
     public List<Transaction> getTransactions() {
         return transactions;
     }
 
     public void setTransactions(List<Transaction> transactions) {
         this.transactions = transactions;
+    }
+
+    @Override
+    public boolean isAccountNonExpired() {
+        return true;
+    }
+
+    @Override
+    public boolean isAccountNonLocked() {
+        return true;
+    }
+
+    @Override
+    public boolean isCredentialsNonExpired() {
+        return true;
+    }
+
+    @Override
+    public boolean isEnabled() {
+        return true;
     }
 }

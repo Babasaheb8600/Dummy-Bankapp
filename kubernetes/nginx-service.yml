@@ -3,6 +3,8 @@ kind: Service
 metadata:
   name: nginx-service
   namespace: bankapp-namespace
+  labels:
+    app: nginx
 spec:
   selector:
     app: nginx
